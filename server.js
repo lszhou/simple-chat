@@ -1,7 +1,7 @@
-// server.js
+// Basic setup
+//==================================================
 
-// BASE SETUP
-// =============================================================================
+// configure datebase
 var mongoose   = require('mongoose');
 mongoose.connect('localhost', 'test');
 var db = mongoose.connection;
@@ -10,27 +10,39 @@ db.once('open', function callback() {
   console.log('Connected to DB');
 });
 
-// call the packages we need
-var express    = require('express');        // call express
-var app        = express();                 // define our app using express
+// require related modules
+var express    = require('express');
+var app        = express();
 var bodyParser = require('body-parser');
 
-// configure app to use bodyParser()
-// this will let us get the data from a POST
+// configure app
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-var port = process.env.PORT || 8080;        // set our port
 
-// ROUTES FOR OUR API
-// =============================================================================
-var router = express.Router();              // get an instance of the express Router
+
+// public routes (all of which will be prefixed with /auth)
+// =========================================================
+var authRouter = require('./routes/auth')(app, express);
+app.use('/auth', authRouter);
+
+
+
+
+
+
+
+
+// Protected routes, Router-level middleware
+// ===========================================================
+/*
+var router = express.Router();
 
 // middleware to use for all requests
 router.use(function(req, res, next) {
-    // do logging
+    // logging process
     console.log('Request is received.');
-    next(); // make sure we go to the next routes and don't stop here
+    next();
 });
 
 
@@ -40,7 +52,7 @@ router.get('/', function(req, res) {
 });
 
 
-//---------------------POST, GET, /api/user ------------------------
+// End point /api/user
 var User = require('./db/models/user');
 router.route('/user')
 
@@ -74,23 +86,22 @@ router.route('/user')
     res.json(users);
   });
 });
+*/
 
-
-
-
-
-
-
-
-
-
-
-
-// REGISTER OUR ROUTES -------------------------------
 // all of our routes will be prefixed with /api
-app.use('/api', router);
+//app.use('/api', router);
 
-// START THE SERVER
+//====================================================================
+
+
+// Start Server
 // =============================================================================
-app.listen(port);
-console.log('Listening happens on port ' + port);
+
+var port = process.env.PORT || 8080; // set our port
+app.listen(port, function(err) {
+  if (err) {
+    console.log(err);
+  } else {
+    console.log('Listening happens on port ' + port);
+  }
+});

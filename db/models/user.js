@@ -1,50 +1,43 @@
-var mongoose = require('mongoose');
-var bcrypt = require('bcrypt');
-var SALT_WORK_FACTOR = 10;
+var mongoose = require('mongoose'),
+    bcrypt = require('bcrypt');
 
-var userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    //required: true,
-    //unique: true
-  },
+var Schema = mongoose.Schema;
 
-  email: {
-    type: String,
-    //required: true,
-    //unique: true
-  },
+var SALTWORKFACTOR = 10;
 
-  password: {
-    type: String,
-    //required: true
-  }
+// An undertain error happens here if I add somemore limit to the fields.
+var UserSchema = new Schema({
+    username: { type: String },
+    email: { type: String },
+    password: { type: String},
+    firstName: { type: String },
+    lastName: { type: String },
+
+    company: { type: String },
+
+    createdOn: { type: Date, default: Date.now },
+    lastSignon: { type: Date, default: Date.now},
 });
 
-
-// Bcrypt middleware
-userSchema.pre('save', function(next) {
-  var user = this;
-
-  if (!user.isModified('password')) return next();
-
-  bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
-    if (err) return next(err);
-
-    bcrypt.hash(user.password, salt, function(err, hash) {
-      if (err) return next(err);
-      user.password = hash;
-      next();
+UserSchema.pre('save', function(next){
+    var user = this;
+    if(!user.isModified('password')) {
+        return next();
+    }
+    bcrypt.genSalt(SALTWORKFACTOR, function(err, salt) {
+        if(err) return next(err);
+        bcrypt.hash(user.password, salt, function(err, hash){
+            if(err) return next(err);
+            user.password = hash;
+            next();
+        });
     });
-  });
 });
 
-// Password verification
-userSchema.methods.comparePassword = function(candidatePassword, cb) {
-  bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
-    if (err) return cb(err);
-    cb(null, isMatch);
-  });
+UserSchema.methods.comparePassword = function(password){
+    var user = this;
+
+    return bcrypt.compareSync(password, user.password);
 };
 
-User = module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('User', UserSchema);
