@@ -27,6 +27,26 @@ var authRouter = require('./routes/auth')(app, express);
 app.use('/auth', authRouter);
 
 
+// Insert authentication middleware - checks tokens
+//=========================================================
+var authMiddleware = require('./auth-middleware');
+app.use(authMiddleware);
+
+
+// Protected routes
+//==========================================================
+var userAPI = require('./routes/api/user')(app, express);
+app.use('/api', userAPI);
+
+
+
+
+
+
+
+
+
+
 
 
 

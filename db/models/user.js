@@ -5,16 +5,14 @@ var Schema = mongoose.Schema;
 
 var SALTWORKFACTOR = 10;
 
-// An undertain error happens here if I add somemore limit to the fields.
+// *An undertain error happens here if I add somemore limit to the fields.
 var UserSchema = new Schema({
     username: { type: String },
     email: { type: String },
     password: { type: String},
     firstName: { type: String },
     lastName: { type: String },
-
     company: { type: String },
-
     createdOn: { type: Date, default: Date.now },
     lastSignon: { type: Date, default: Date.now},
 });
